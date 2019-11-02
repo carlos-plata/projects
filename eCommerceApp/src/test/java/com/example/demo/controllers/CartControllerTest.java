@@ -10,6 +10,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.example.demo.model.persistence.Cart;
@@ -17,8 +19,8 @@ import com.example.demo.model.requests.CreateUserRequest;
 import com.example.demo.model.requests.ModifyCartRequest;
 
 @RunWith(SpringRunner.class)
-@DataJpaTest
-@ComponentScan("com.example.demo.controllers")
+@DataJpaTest()
+@Import({ CartController.class, UserController.class })
 public class CartControllerTest {
 	@Autowired
 	private CartController cartController;
