@@ -1,56 +1,39 @@
 package com.example.demo.controllers;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Before;
+import java.util.List;
+
 import org.junit.Test;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import com.example.demo.TestUtils;
-import com.example.demo.model.persistence.User;
-import com.example.demo.model.persistence.repositories.CartRepository;
-import com.example.demo.model.persistence.repositories.UserRepository;
-import com.example.demo.model.requests.CreateUserRequest;
+import com.example.demo.model.persistence.Item;
+import com.example.demo.model.persistence.repositories.ItemRepository;
 
+@RunWith(SpringRunner.class)
+@DataJpaTest
 public class ItemControllerTest {
+	@Autowired
+	private ItemRepository itemRepository;
 
-	private UserController userController;
-
-	private UserRepository userRepo = mock(UserRepository.class);
-
-	private CartRepository cartRepo = mock(CartRepository.class);
-
-	private BCryptPasswordEncoder encoder = mock(BCryptPasswordEncoder.class);
-
-	@Before
-	public void setup() {
-		userController = new UserController();
-		TestUtils.injectObjects(userController, "userRepository", userRepo);
-		TestUtils.injectObjects(userController, "cartRepository", cartRepo);
-		TestUtils.injectObjects(userController, "bCryptPasswordEncoder", encoder);
+	@Test
+	public void getItems() {
+		List<Item> items = itemRepository.findAll();
+		assertThat(items.size()).isEqualTo(2);
 	}
 
 	@Test
-	public void createUser() {
-		when(encoder.encode("testPassword")).thenReturn("thisIsHashed");
-		CreateUserRequest request = new CreateUserRequest();
-		request.setUsername("test");
-		request.setPassword("testPassword");
-		request.setConfirmPassword("testPassword");
+	public void findItemById() {
+		Item found = itemRepository.findById(1L).get();
+		assertThat(found.getName()).isEqualTo("Round Widget");
+	}
 
-		ResponseEntity<User> response = userController.createUser(request);
-
-		assertNotNull(response);
-		assertEquals(200, response.getStatusCodeValue());
-
-		User user = response.getBody();
-		assertNotNull(user);
-		assertEquals(0, user.getId());
-		assertEquals("test", user.getUsername());
-		assertEquals("thisIsHashed", user.getPassword());
-
+	@Test
+	public void findItemByName() {
+		List<Item> items = itemRepository.findByName("Square Widget");
+		assertThat(items.size()).isEqualTo(1);
 	}
 }
