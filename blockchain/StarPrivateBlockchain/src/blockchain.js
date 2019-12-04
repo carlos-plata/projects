@@ -74,16 +74,9 @@ class Blockchain {
         }
         // Block hash with SHA256 using newBlock and converting to a string
         block.hash = SHA256(JSON.stringify(block)).toString();
-        // Adding block object to chain
-      	let newChainHeight = this.chain.push(block);
-       let self = this;
+        let self = this;
         return new Promise(async (resolve, reject) => {
-        	if(newChainHeight > originalHeight){
-        		console.log("Returnind added block: " + JSON.stringify(self.chain[self.chain.length - 1]));
-        		resolve(self.chain[self.chain.length - 1]);
-        	}else{
-        		reject('No Block has been added to chain.');
-        	}    
+			resolve(self.chain[self.chain.push(block) - 1]);
         });
     }
 
@@ -140,7 +133,12 @@ class Blockchain {
     getBlockByHash(hash) {
         let self = this;
         return new Promise((resolve, reject) => {
-           
+            let block = self.chain.filter(p => p.hash === hash)[0];
+            if(block){
+                resolve(block);
+            } else {
+                resolve(null);
+            }
         });
     }
 
