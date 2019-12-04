@@ -11,6 +11,7 @@
 const SHA256 = require('crypto-js/sha256');
 const BlockClass = require('./block.js');
 const bitcoinMessage = require('bitcoinjs-message');
+const hex2ascii = require('hex2ascii');
 
 class Blockchain {
 
@@ -62,7 +63,6 @@ class Blockchain {
      * that this method is a private method. 
      */
     _addBlock(block) {
-		console.log("_addBlock(" + block.body +")");
 		let originalHeight= this.chain.length;
         // Block height
     	block.height = this.chain.length;
@@ -90,7 +90,7 @@ class Blockchain {
      */
     requestMessageOwnershipVerification(address) {
         return new Promise((resolve) => {
-            
+            resolve(address + ':' + new Date().getTime().toString() + ':starRegistry');
         });
     }
 
@@ -115,12 +115,13 @@ class Blockchain {
     	let newBlock = new BlockClass.Block(star);
         let self = this;
         return new Promise(async (resolve, reject) => {
-        	if(newBlock.body != null){
+        	let interval = (parseInt(new Date().getTime().toString()) - parseInt(message.split(':')[1]))/60000;
+        	let validMessage= bitcoinMessage.verify(message, address, signature);
+        	if(validMessage){
         		resolve(self._addBlock(newBlock));
         	}else{
         		reject(Error('No Block has been created.'));
-        	}
-            
+        	} 
         });
     }
 
@@ -169,7 +170,15 @@ class Blockchain {
         let self = this;
         let stars = [];
         return new Promise((resolve, reject) => {
-            
+            let owner = {"owner" : address};
+            for (let i = 0; i < self.chain.length; i++) {
+            	let star = ('"star":' + hex2ascii(self.chain[i].body));
+            	let block = {...owner, ...star};
+            	stars.push(block);
+    		}
+            if(stars.length > 0){
+            	resolve(stars);
+            }
         });
     }
 
@@ -183,10 +192,12 @@ class Blockchain {
         let self = this;
         let errorLog = [];
         return new Promise(async (resolve, reject) => {
-            
+        	errorLog = self.chain.filter(p => p.validate());
+        	if(errorLog.length > 0){
+        		resolve(errorLog);
+        	}
         });
     }
-
 }
 
 module.exports.Blockchain = Blockchain;   
