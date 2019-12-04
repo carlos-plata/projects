@@ -39,18 +39,20 @@ class Block {
         let self = this;
         return new Promise((resolve, reject) => {
             // Save current block hash
-        	let blockHash = self.hash;
-        	self.hash = '';
+        	let currentHash = self.hash;
+        	self.hash = null;
             // Recalculate the hash of the Block
-        	let validBlockHash = SHA256(JSON.stringify(self)).toString();
+        	let newHash = SHA256(JSON.stringify(self)).toString();
+        	// assigning newHash to block's hash property
+        	self.hash= currentHash;
             // Comparing if the hashes changed
-        	 if (blockHash===validBlockHash) {
+        	 if (currentHash===newHash) {
         		// Returning the Block hash is valid
-        		 console.log('Valid Block hash:\n' + blockHash + '==' + validBlockHash);
+        		 console.log('Valid Block hash:\n' + currentHash + '==' + newHash);
                  resolve(true);
              } else {
             	// Returning the Block is not valid
-                console.log('Invalid Block hash:\n' + blockHash + '<>' + validBlockHash);
+                console.log('Invalid Block hash:\n' + currentHash + '<>' + newHash);
                 resolve(false);
              }
         });
@@ -67,13 +69,19 @@ class Block {
      */
     getBData() {
         // Getting the encoded data saved in the Block
+    	let block = self;
         // Decoding the data to retrieve the JSON representation of the object
-        // Parse the data to an object to be retrieve.
-
+    	block = Buffer(JSON.stringify(block)).toString('hex2ascii'); 
         // Resolve with the data if the object isn't the Genesis block
-
+        return new Promise(async (resolve, reject) => {
+        	if(block.height > 0){
+        		resolve(block.body);
+        	}else{
+        		reject(Error('Cannot return Genesis Block.'));
+        	}
+            
+        });
     }
-
 }
 
 module.exports.Block = Block;                    // Exposing the Block class as a module
