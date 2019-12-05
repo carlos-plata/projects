@@ -112,17 +112,22 @@ class Blockchain {
      * @param {*} star 
      */
     submitStar(address, message, signature, star) {
-    	let newBlock = new BlockClass.Block(star);
+    	let block= {
+    			"address" : address,
+    			"star" : star
+    	}
+    	let newBlock = new BlockClass.Block(block);
         let self = this;
-        return new Promise(async (resolve, reject) => {
-        	let interval = (parseInt(new Date().getTime().toString()) - parseInt(message.split(':')[1]))/60000;
+        let isValidMessage =  new Promise(async (resolve, reject) => {
         	let validMessage= bitcoinMessage.verify(message, address, signature);
-        	if(validMessage){
+        	let validInterval = (((parseInt(new Date().getTime().toString()) - parseInt(message.split(':')[1]))/60000) > 5);
+        	if(validMessage && validInterval){
         		resolve(self._addBlock(newBlock));
         	}else{
-        		reject(Error('No Block has been created.'));
-        	} 
+        		reject('No Block Created');
+        	}
         });
+        return (isValidMessage);
     }
 
     /**
@@ -169,15 +174,21 @@ class Blockchain {
     getStarsByWalletAddress (address) {
         let self = this;
         let stars = [];
-        return new Promise((resolve, reject) => {
-            let owner = {"owner" : address};
+        return new Promise(async (resolve, reject) => {
             for (let i = 0; i < self.chain.length; i++) {
-            	let star = ('"star":' + hex2ascii(self.chain[i].body));
-            	let block = {...owner, ...star};
-            	stars.push(block);
+            	try { 
+            		  let decodedBody = await self.chain[i].getBData(self.chain[i].body);
+	                  if(JSON.parse(decodedBody).address == address){
+	                	 stars.push(JSON.parse(decodedBody));
+	                  }
+            		} catch(error) {
+            			console.log(error);
+            		}
     		}
             if(stars.length > 0){
             	resolve(stars);
+            }else{
+            	reject('No results that match the address.');
             }
         });
     }
