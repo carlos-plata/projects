@@ -120,7 +120,7 @@ class Blockchain {
         let self = this;
         let isValidMessage =  new Promise(async (resolve, reject) => {
         	let validMessage= bitcoinMessage.verify(message, address, signature);
-        	let validInterval = (((parseInt(new Date().getTime().toString()) - parseInt(message.split(':')[1]))/60000) > 5);
+        	let validInterval = (((parseInt(new Date().getTime().toString()) - parseInt(message.split(':')[1]))/60000) < 5);
         	if(validMessage && validInterval){
         		resolve(self._addBlock(newBlock));
         	}else{
@@ -202,11 +202,18 @@ class Blockchain {
     validateChain() {
         let self = this;
         let errorLog = [];
+        let prevHash= null;
         return new Promise(async (resolve, reject) => {
-        	errorLog = self.chain.filter(p => p.validate());
-        	if(errorLog.length > 0){
-        		resolve(errorLog);
-        	}
+        	for (var i = 0; i < self.chain.length; i++) {
+				let isValid = await self.chain[i].validate();
+				if(!isValid){
+					errorLog.push(self.chain[i]);
+				}
+				if(self.chain[i].previousBlockHash != prevHash){
+					errorLog.push(self.chain[i]);
+				}
+				prevHash = self.chain[i].hash;
+			}
         });
     }
 }
