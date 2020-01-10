@@ -47,7 +47,7 @@ public class ReservationControllerTest {
 		mockRoomReservation.setRoomName("Coolest Room");
 		mockReservationList.add(mockRoomReservation);
 
-		given(reservationService.getRoomReservationsForDate(date)).willReturn(mockReservationList);
+		given(reservationService.getRoomReservationsForDate("2017-01-01")).willReturn(mockReservationList);
 		this.mockMvc.perform(get("/reservations?date=2017-01-01")).andExpect(status().isOk())
 				.andExpect(content().string(containsString("Argento, Charlie")));
 	}
