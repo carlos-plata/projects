@@ -1,2 +1,2 @@
 Personal projects.  
-Technologies involved: JEE, Javascript, Node.js, Blockchain, etc.
+Technologies involved: JEE, Blockchain, Javascript, Node.js, Solidity, etc.
