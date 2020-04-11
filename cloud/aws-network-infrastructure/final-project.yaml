@@ -43,6 +43,12 @@ Resources:
         FromPort: 0
         ToPort: 65535
         CidrIp: 0.0.0.0/0
+  ProfileWithRolesForOurApp:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - s3FullAccess
   WebAppLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
@@ -50,14 +56,18 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash
           apt-get update -y
+          apt-get install unzip awscli -y
           apt-get install apache2 -y
           systemctl start apache2.service
           cd /var/www/html
-          echo "It works! Udagram, Udacity." > index.html
-      ImageId: ami-06d51e91cea0dac8d
+          aws s3 cp s3://project2s3bucket/project2.zip .
+          unzip -o project2.zip
+      ImageId: ami-07b4f3c02c7f83d59
       SecurityGroups:
       - Ref: WebServerSecGroup
-      InstanceType: t3.small
+      InstanceType: t2.small
+      IamInstanceProfile: 
+        Ref: ProfileWithRolesForOurApp
       BlockDeviceMappings:
       - DeviceName: "/dev/sdk"
         Ebs:
