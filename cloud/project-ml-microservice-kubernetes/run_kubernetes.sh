@@ -16,5 +16,7 @@ kubectl get pods
 
 # Step 4:
 # Forward the container port to a host
+echo "waiting 30 seconds before port-forward"
+sleep 30
 kubectl port-forward udacitymicroservice 8000:80 
 kubectl logs --selector app=udacitymicroservice
