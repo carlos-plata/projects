@@ -1,7 +1,7 @@
 # Udacity Nanoedegree - Cloud DevOps Engineer - Capstone project
 
 
-Deploys a Websocket Java app to AWS with CircleCI
+Deploys a Websocket Java Webchat app to AWS with CircleCI
 
 Builds the infrastructure using AWS CloudFormation
 
