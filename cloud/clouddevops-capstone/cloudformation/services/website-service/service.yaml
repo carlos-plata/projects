@@ -59,7 +59,7 @@ Resources:
             ContainerDefinitions:
                 - Name: website-service
                   Essential: true
-                  Image: <URI>:1.0.0
+                  Image: registry.hub.docker.com/charliesilver/webchat:1.0.0
                   Memory: 500
                   PortMappings:
                     - ContainerPort: 8080
