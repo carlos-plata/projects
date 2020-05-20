@@ -3,13 +3,10 @@
 Uses AWS Cloudformation Template as base template. https://github.com/aws-samples/ecs-refarch-cloudformation
 
 
-Deploys a Websocket Java Webchat app to AWS with CircleCI
-
-
 Builds the infrastructure using AWS CloudFormation
 
 
 Uses AWS S3 to store builds and cloudformation templates
 
 
-Deploys the web app using CircleCI
+Deploys a Websocket Java Webchat app to AWS with CircleCI
